@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload de Arquivo</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link para o CSS externo -->
+    <link rel="stylesheet" href="styles.css">
     <script>
         let filesArray = [];
-    
+
         function updateFileList() {
             const fileList = document.getElementById('fileList');
             fileList.innerHTML = '';
-    
+
             filesArray.forEach((file, index) => {
                 const listItem = document.createElement('li');
                 listItem.textContent = file.name;
@@ -23,25 +23,25 @@
                 listItem.appendChild(removeButton);
                 fileList.appendChild(listItem);
             });
-    
+
             const message = filesArray.length > 0 ? 'Arquivos escolhidos: ' + filesArray.length : 'Nenhum arquivo escolhido.';
             document.getElementById('fileMessage').textContent = message;
         }
-    
+
         function addFiles(event) {
             const newFiles = Array.from(event.target.files);
-            filesArray = [...filesArray, ...newFiles]; // Combina arquivos existentes com novos
+            filesArray = [...filesArray, ...newFiles];
             updateFileList();
         }
-    
+
         function removeFile(index) {
             filesArray.splice(index, 1);
             updateFileList();
         }
-    
+
         function validateFiles(event) {
             event.preventDefault();
-    
+
             let totalSize = 0;
             for (const file of filesArray) {
                 totalSize += file.size;
@@ -50,73 +50,117 @@
                 alert('Erro: O tamanho total dos arquivos não pode exceder 250MB.');
                 return false;
             }
-    
+
             submitForm(event);
         }
-    
+
         function showSuccessPopup() {
             const modal = document.createElement('div');
             modal.className = 'modal';
             modal.style.display = 'block';
-    
+
             const modalContent = document.createElement('div');
             modalContent.className = 'modal-content';
-    
+
             const header = document.createElement('h2');
             header.innerText = 'Sucesso!';
             modalContent.appendChild(header);
-    
+
             const message = document.createElement('p');
             message.innerText = 'Os arquivos foram enviados com sucesso!';
             modalContent.appendChild(message);
-    
+
             const closeButton = document.createElement('span');
             closeButton.className = 'close';
             closeButton.innerHTML = '&times;';
-            closeButton.onclick = function() {
+            closeButton.onclick = function () {
                 modal.style.display = 'none';
                 document.body.removeChild(modal);
             };
             modalContent.appendChild(closeButton);
-    
+
             modal.appendChild(modalContent);
             document.body.appendChild(modal);
         }
-    
+
         function submitForm(event) {
             const form = event.target;
             const formData = new FormData(form);
-    
-            // Adiciona os arquivos do array ao FormData
-            filesArray.forEach(file => {
-                formData.append('files', file); // Adiciona cada arquivo ao FormData
-            });
-    
+
+            // Reinicia o custo para 0 sempre que o formulário é enviado
+            let cost = 0;
+
+            const quantity = parseInt(formData.get('quantidade'), 10); // Número de cópias selecionadas
+            const type = formData.get('tipo');
+
+            // Cálculo do custo
+            switch (type) {
+                case 'Preto e Branco':
+                    cost = 1 + (quantity - 1) * 0.5; // R$ 1,00 + R$ 0,50 por folha a mais
+                    break;
+                case 'Colorido':
+                    cost = 2 + (quantity - 1) * 1; // R$ 2,00 + R$ 1,00 por folha a mais
+                    break;
+                case 'Xerox':
+                    cost = quantity * 0.5; // R$ 0,50 por folha
+                    break;
+            }
+
+            // Adiciona os dados de quantidade e tipo ao FormData
+            formData.append('custo', cost.toFixed(2)); // Armazena o custo total formatado
+            formData.append('tipo', type);
+
+            // Adiciona os arquivos ao FormData
+            for (let file of filesArray) {
+                formData.append('files', file);
+            }
+
             fetch('/upload', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro na resposta do servidor');
-                }
-                return response.json();
-            })
-            .then(data => {
-                showSuccessPopup();
-                form.reset();
-                filesArray = [];
-                updateFileList();
-            })
-            .catch(error => {
-                alert('Erro: ' + error.message);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showSuccessPopup();
+                    form.reset();
+                    filesArray = [];
+                    document.getElementById('totalCost').textContent = 'Total: R$ 0,00'; // Zera o custo exibido
+                    updateFileList();
+                })
+                .catch(error => {
+                    alert('Erro: ' + error.message);
+                });
         }
-    
+
+        function updatePrice() {
+            const quantity = parseInt(document.getElementById('user-quantity').value, 10) || 0;
+            const type = document.getElementById('user-type').value;
+            let cost = 0;
+
+            switch (type) {
+                case 'Preto e Branco':
+                    cost = 1 + (quantity - 1) * 0.5;
+                    break;
+                case 'Colorido':
+                    cost = 2 + (quantity - 1) * 1;
+                    break;
+                case 'Xerox':
+                    cost = quantity * 0.5;
+                    break;
+            }
+
+            document.getElementById('totalCost').textContent = `Total: R$ ${cost.toFixed(2)}`;
+        }
+
         function openPriceModal() {
             const modal = document.getElementById('priceModal');
             modal.style.display = 'block';
-    
+
             const modalContent = modal.querySelector('.modal-content p');
             modalContent.innerHTML = `
                 Preto e Branco: <strong>R$ 1,00</strong> e cada folha a mais <strong>R$ 0,50</strong><br>
@@ -124,12 +168,12 @@
                 Xerox e Digitalização: <strong>R$ 0,50</strong>
             `;
         }
-    
+
         function closePriceModal() {
             const modal = document.getElementById('priceModal');
             modal.style.display = 'none';
         }
-    </script>    
+    </script>
 </head>
 
 <body>
@@ -147,9 +191,24 @@
             </div>
 
             <label for="file-input" class="file-label">Escolher Arquivos</label>
-            <input type="file" id="file-input" name="files" multiple required onchange="addFiles(event)" class="file-input" />
+            <input type="file" id="file-input" name="files" multiple required onchange="addFiles(event)"
+                class="file-input" />
             <ul id="fileList" class="file-list"></ul>
             <p id="fileMessage" class="file-message">Nenhum arquivo escolhido.</p>
+
+            <label for="user-quantity">Cópias:</label>
+            <input type="number" id="user-quantity" name="quantidade" min="1" max="99" required
+                oninput="updatePrice()" />
+
+            <label for="user-type">Tipo:</label>
+            <select id="user-type" name="tipo" required onchange="updatePrice()">
+                <option value="Preto e Branco">Preto e Branco</option>
+                <option value="Colorido">Colorido</option>
+                <option value="Xerox">Xerox</option>
+            </select>
+
+            <p id="totalCost">Total: R$ 0,00</p> <!-- Exibe o custo total -->
+
             <button type="submit" class="submit-button">Enviar</button>
             <button type="button" class="price-button" onclick="openPriceModal()">Tabela de Preço</button>
         </form>
