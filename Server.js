@@ -1,63 +1,57 @@
-require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
-const port = process.env.PORT || 3000;
-const uploadsFolder = process.env.UPLOADS_FOLDER || 'uploads';
-
-// Configuração do multer para armazenar arquivos
-const storage = multer.memoryStorage(); // Usando memória para manipular os arquivos antes de salvá-los
-
-const upload = multer({ 
-  storage,
-  limits: { fileSize: 250 * 1024 * 1024 } // Limite de 250MB para cada arquivo
-});
-
+// Inicializa o aplicativo Express
 const app = express();
+const port = 3000;
 
-// Middleware para suportar formulários URL-encoded
+// Middleware para servir arquivos estáticos (HTML, CSS, etc.)
+app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public'))); // Serve arquivos estáticos
 
-// Rota para a página de upload na raiz
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html')); // Envia o HTML
-});
+// Função para criar a pasta com nome/curso e data/hora
+const createFolder = (name, course) => {
+    const now = new Date();
+    const date = now.toLocaleDateString('pt-BR').replace(/\//g, '-');
+    const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }).replace(':', '-');
+    const folderName = `${name}/${course} - ${date}-${time}`;
+    const folderPath = path.join(__dirname, 'uploads', folderName);
 
-// Rota para processar o upload de arquivos
-app.post('/upload', upload.array('files'), (req, res) => { // Mudei a rota para '/upload'
-  const now = new Date();
-  const folderName = now.toISOString().replace(/:/g, '-');
-  const dir = path.join(__dirname, uploadsFolder, folderName);
-
-  // Cria uma única pasta para todos os arquivos do upload
-  fs.mkdirSync(dir, { recursive: true });
-
-  // Salva cada arquivo no diretório criado
-  req.files.forEach(file => {
-    const filePath = path.join(dir, file.originalname);
-    fs.writeFileSync(filePath, file.buffer); // Salva o arquivo na pasta
-  });
-
-  // Após o upload, redireciona para a raiz para atualizar o formulário
-  res.redirect('/'); // Redireciona para a página principal após o upload
-});
-
-// Middleware para tratar erros de upload
-app.use((err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).send('Erro: O tamanho do arquivo é muito grande. O limite é de 250MB.');
+    if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath, { recursive: true });
     }
-  } else if (err) {
-    return res.status(500).send('Erro ao fazer o upload dos arquivos.');
-  }
-  next();
+    return folderPath;
+};
+
+// Configuração do Multer para armazenar arquivos
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const folderPath = createFolder(req.body.nome, req.body.curso);
+        cb(null, folderPath);
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({ storage });
+
+// Rota para upload de arquivos
+app.post('/upload', upload.array('files', 10), (req, res) => {
+    if (!req.body.nome || !req.body.curso) {
+        return res.status(400).json({ message: 'Nome e curso são obrigatórios.' });
+    }
+
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ message: 'Nenhum arquivo foi enviado.' });
+    }
+
+    res.json({ message: 'Arquivos enviados com sucesso!' });
 });
 
 // Inicia o servidor
 app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`Servidor rodando em http://localhost:${port}`);
 });

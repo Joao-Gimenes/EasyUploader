@@ -1,4 +1,3 @@
-/* styles.css */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -9,12 +8,12 @@ body {
 
 h1 {
     text-align: center;
-    color: #4a90e2; /* Cor do título */
+    color: #4a90e2;
 }
 
 .container {
-    max-width: 600px; /* Max largura do contêiner */
-    margin: 0 auto; /* Centraliza o contêiner */
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 form {
@@ -24,25 +23,43 @@ form {
     padding: 20px;
 }
 
-input[type="file"] {
-    display: none; /* Esconde o input original */
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
 }
 
-label {
-    display: inline-block;
-    background-color: #4a90e2; /* Cor do botão */
+.form-group label {
+    font-size: 18px; /* Aumentado o tamanho do texto */
+    margin-right: 10px;
+    font-weight: bold; /* Deixar o label em negrito */
+    width: 80px; /* Aumentado o espaço para o label */
+}
+
+.form-group input {
+    width: calc(100% - 90px); /* Reduzido o input */
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+label.file-label {
+    background-color: #4a90e2;
     color: white;
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
     margin-bottom: 10px;
-    width: auto; /* Ajusta a largura para o conteúdo */
-    text-align: center; /* Centraliza o texto */
+    width: auto;
+    text-align: center;
 }
 
-label:hover {
-    background-color: #357ab7; /* Cor do botão ao passar o mouse */
+label.file-label:hover {
+    background-color: #357ab7;
 }
 
 ul {
@@ -58,172 +75,123 @@ li {
     border-radius: 5px;
     padding: 10px;
     margin-top: 5px;
-    width: 100%; /* Garante que a lista ocupe 100% da largura */
-    box-sizing: border-box; /* Inclui padding e borda no cálculo da largura total */
-    overflow: hidden; /* Impede que o conteúdo exceda a área do item da lista */
-}
-
-.file-name {
-    flex: 1; /* Faz o nome do arquivo ocupar o espaço restante */
-    white-space: nowrap; /* Impede a quebra de linha */
-    overflow: hidden; /* Esconde o texto que ultrapassa */
-    text-overflow: ellipsis; /* Adiciona '...' no final do texto cortado */
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .remove-button {
-    margin-left: 10px; /* Margem à esquerda do botão */
-    flex-shrink: 0; /* Impede que o botão encolha */
+    margin-left: 10px;
+    flex-shrink: 0;
 }
 
 button {
-    background-color: #e74c3c; /* Cor do botão de remover */
+    background-color: #e74c3c;
     color: white;
     border: none;
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
-    width: 80px; /* Tamanho fixo */
+    width: 80px;
     transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #c0392b; /* Cor do botão de remover ao passar o mouse */
+    background-color: #c0392b;
 }
 
 .submit-button {
-    background-color: #e74c3c; /* Cor do botão Enviar */
+    background-color: #e74c3c;
     color: white;
     border: none;
-    padding: 8px 12px; /* Diminuindo o tamanho do botão */
+    padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
-    width: 80px; /* Mantendo um tamanho fixo */
-    transition: background-color 0.3s;
-    margin-top: 10px; /* Margem para o botão Enviar */
+    width: 80px;
+    margin-top: 10px;
 }
 
 .submit-button:hover {
-    background-color: #c0392b; /* Cor ao passar o mouse */
+    background-color: #c0392b;
 }
 
 #fileList {
-    max-height: 200px; /* Limita a altura da lista de arquivos */
-    overflow-y: auto; /* Adiciona rolagem se necessário */
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 #fileMessage {
     text-align: center;
     font-weight: bold;
     margin-top: 10px;
-    font-size: 14px; /* Tamanho menor */
+    font-size: 14px;
     color: #777;
 }
 
-/* Estilizando o botão Enviar para telas menores */
-@media (max-width: 600px) {
-    .submit-button {
-        width: auto; /* Largura automática em telas menores */
-        margin: 10px auto; /* Centraliza o botão */
-    }
-}
-
-/* Botão Tabela de Preço */
 .price-button {
-    background-color: #007BFF; /* Cor azul */
+    background-color: #007BFF;
     color: white;
     border: none;
-    padding: 12px 20px; /* Aumentar o espaçamento */
+    padding: 12px 20px;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 15px; /* Espaço acima do botão */
-    display: block; /* Para ocupar toda a largura disponível */
-    width: 100%; /* Largura completa do container */
-    font-size: 16px; /* Tamanho da fonte */
-    font-weight: bold; /* Negrito */
-    transition: background-color 0.3s ease; /* Transição suave */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra */
+    margin-top: 15px;
+    display: block;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s;
 }
 
 .price-button:hover {
-    background-color: #0056b3; /* Cor azul mais escura ao passar o mouse */
+    background-color: #0056b3;
 }
 
-/* Estilos do modal */
 .modal {
-    display: none; /* Esconde o modal por padrão */
-    position: fixed; /* Fica fixo na tela */
-    z-index: 1; /* Fica acima de outros elementos */
+    display: none;
+    position: fixed;
+    z-index: 1;
     left: 0;
     top: 0;
-    width: 100%; /* Largura completa */
-    height: 100%; /* Altura completa */
-    overflow: auto; /* Habilita o scroll se necessário */
-    background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente */
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 60px;
 }
 
-/* Conteúdo do modal */
 .modal-content {
-    background-color: #fff; /* Cor de fundo branca */
-    margin: auto; /* Centraliza o modal vertical e horizontalmente */
-    padding: 20px; /* Espaçamento interno */
-    border: 1px solid #888; /* Borda do modal */
-    width: 90%; /* Largura do modal */
-    max-width: 600px; /* Aumentar largura máxima do modal */
-    border-radius: 10px; /* Bordas arredondadas */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra no modal */
-    white-space: normal; /* Permite quebras de linha */
-    position: absolute; /* Posicionamento absoluto */
-    top: 50%; /* 50% do topo da tela */
-    left: 50%; /* 50% da esquerda da tela */
-    transform: translate(-50%, -50%); /* Centraliza o modal */
+    background-color: white;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+    border-radius: 10px;
 }
 
-/* Estilo para o cabeçalho do modal */
 .modal-content h2 {
-    margin: 0; /* Remove a margem do cabeçalho */
-    font-size: 24px; /* Tamanho do cabeçalho */
-    color: #333; /* Cor do texto do cabeçalho */
+    color: #2ecc71;
 }
 
-/* Estilo para o texto no modal */
 .modal-content p {
-    font-size: 18px; /* Tamanho do texto */
-    color: #555; /* Cor do texto */
-    line-height: 1.5; /* Espaçamento entre linhas */
-    word-spacing: normal; /* Espaçamento normal entre palavras */
-    margin-bottom: 0; /* Remove a margem inferior */
+    font-size: 18px;
+    line-height: 1.6;
 }
 
-/* Estilo para a tabela de preços */
-.price-table {
-    width: 100%; /* Largura completa */
-    border-collapse: collapse; /* Remove espaço entre bordas */
-    margin-top: 15px; /* Espaço acima da tabela */
-}
-
-.price-table th, .price-table td {
-    padding: 10px; /* Espaçamento interno */
-    text-align: left; /* Alinhamento à esquerda */
-    border: 1px solid #ddd; /* Borda da tabela */
-}
-
-.price-table th {
-    background-color: #f1f1f1; /* Cor do cabeçalho */
-    font-weight: bold; /* Negrito */
-}
-
-/* Botão de fechar do modal */
 .close {
-    color: #aaa; /* Cor do botão de fechar */
-    float: right; /* Alinhado à direita */
-    font-size: 28px; /* Tamanho da fonte */
-    font-weight: bold; /* Negrito */
-    margin-top: 10px; /* Margem acima do botão de fechar */
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
 }
 
 .close:hover,
 .close:focus {
-    color: black; /* Cor ao passar o mouse ou focar */
-    text-decoration: none; /* Sem sublinhado */
-    cursor: pointer; /* Cursor de ponteiro */
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }

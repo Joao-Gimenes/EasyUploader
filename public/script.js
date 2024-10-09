@@ -49,3 +49,31 @@ function prepareFilesForUpload(event) {
 
     input.files = dataTransfer.files; // Atualiza o input de arquivos
 }
+
+function submitForm(event) {
+    event.preventDefault(); // Impede o envio padrão do formulário
+
+    const form = event.target; // Obtém o formulário
+    const formData = new FormData(form); // Cria um FormData com os dados do formulário
+
+    // Faz o upload do formulário usando fetch
+    fetch('/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na resposta do servidor');
+        }
+        return response.json(); // Converte a resposta para JSON
+    })
+    .then(data => {
+        alert(data.message); // Mostra a mensagem de sucesso em um pop-up
+        form.reset(); // Reseta os campos do formulário
+        filesArray = []; // Limpa o array de arquivos
+        updateFileList(); // Atualiza a lista de arquivos
+    })
+    .catch(error => {
+        alert('Erro: ' + error.message); // Mostra o erro em um pop-up
+    });
+}
