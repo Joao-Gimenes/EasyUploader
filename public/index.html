@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de Arquivo</title>
+    <link rel="stylesheet" href="css/styles.css"> <!-- Link para o CSS -->
+    <script defer src="js/script.js"></script> <!-- Link para o JS -->
+</head>
+<body>
+    <div class="container">
+        <h1>Upload de Arquivo</h1>
+        <form action="/" method="POST" enctype="multipart/form-data" onsubmit="prepareFilesForUpload(event); return validateFiles()">
+            <input type="file" name="files" multiple required onchange="addFiles(event)" /> <!-- Permite múltiplos arquivos -->
+            <ul id="fileList"></ul> <!-- Lista de arquivos selecionados -->
+            <p id="fileMessage">Nenhum arquivo escolhido.</p> <!-- Mensagem de arquivos escolhidos -->
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+</body>
+</html>
