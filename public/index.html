@@ -4,18 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload de Arquivo</title>
-    <link rel="stylesheet" href="css/styles.css"> <!-- Link para o CSS -->
-    <script defer src="js/script.js"></script> <!-- Link para o JS -->
+    <link rel="stylesheet" href="styles.css"> <!-- Link para o CSS externo -->
+    <script>
+        let filesArray = []; // Array para armazenar os arquivos selecionados
+
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = ''; // Limpa a lista atual
+
+            filesArray.forEach((file, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = file.name; // Nome do arquivo
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remover';
+                removeButton.className = 'remove-button'; // Classe para estilo
+                removeButton.onclick = () => removeFile(index); // Atribui a função de remover ao botão
+                listItem.appendChild(removeButton);
+                fileList.appendChild(listItem);
+            });
+
+            // Atualiza a mensagem de arquivos escolhidos
+            const message = filesArray.length > 0 ? 'Arquivos escolhidos: ' + filesArray.length : 'Nenhum arquivo escolhido.';
+            document.getElementById('fileMessage').textContent = message; // Atualiza a mensagem com o número correto
+        }
+
+        function addFiles(event) {
+            const newFiles = Array.from(event.target.files); // Adiciona arquivos selecionados ao array
+            filesArray.push(...newFiles); // Adiciona os novos arquivos ao array existente
+            updateFileList(); // Atualiza a lista de arquivos
+        }
+
+        function removeFile(index) {
+            filesArray.splice(index, 1); // Remove o arquivo do array
+            updateFileList(); // Atualiza a lista de arquivos
+        }
+
+        function validateFiles() {
+            let totalSize = 0;
+            for (const file of filesArray) {
+                totalSize += file.size;
+            }
+            if (totalSize > 250 * 1024 * 1024) { // Verifica se o tamanho total dos arquivos excede 250MB
+                alert('Erro: O tamanho total dos arquivos não pode exceder 250MB.');
+                return false; // Impede o envio do formulário
+            }
+            return true; // Permite o envio do formulário
+        }
+
+        function prepareFilesForUpload(event) {
+            const input = document.querySelector('input[type="file"]');
+            const dataTransfer = new DataTransfer(); // Para criar uma nova lista de arquivos
+            filesArray.forEach(file => dataTransfer.items.add(file)); // Adiciona os arquivos selecionados
+
+            input.files = dataTransfer.files; // Atualiza o input de arquivos
+        }
+
+        function openPriceModal() {
+            const modal = document.getElementById('priceModal');
+            modal.style.display = 'block'; // Mostra o modal
+
+            // Adiciona os preços ao conteúdo do modal
+            const modalContent = modal.querySelector('.modal-content p');
+            modalContent.innerHTML = `
+                Preto e Branco: <strong>R$ 1,00</strong> e cada folha a mais <strong>R$ 0,50</strong><br>
+                Colorido: <strong>R$ 2,00</strong> e cada folha a mais <strong>R$ 1,00</strong><br>
+                Xerox e Digitalização: <strong>R$ 0,50</strong>
+            `;
+        }
+
+        function closePriceModal() {
+            const modal = document.getElementById('priceModal');
+            modal.style.display = 'none'; // Esconde o modal
+        }
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>Upload de Arquivo</h1>
-        <form action="/" method="POST" enctype="multipart/form-data" onsubmit="prepareFilesForUpload(event); return validateFiles()">
-            <input type="file" name="files" multiple required onchange="addFiles(event)" /> <!-- Permite múltiplos arquivos -->
-            <ul id="fileList"></ul> <!-- Lista de arquivos selecionados -->
-            <p id="fileMessage">Nenhum arquivo escolhido.</p> <!-- Mensagem de arquivos escolhidos -->
-            <button type="submit">Enviar</button>
+        <form action="/upload" method="POST" enctype="multipart/form-data" onsubmit="prepareFilesForUpload(event); return validateFiles()">
+            <label for="file-input" class="file-label">Escolher Arquivos</label>
+            <input type="file" id="file-input" name="files" multiple required onchange="addFiles(event)" class="file-input" /> <!-- Permite múltiplos arquivos -->
+            <ul id="fileList" class="file-list"></ul> <!-- Lista de arquivos selecionados -->
+            <p id="fileMessage" class="file-message">Nenhum arquivo escolhido.</p> <!-- Mensagem de arquivos escolhidos -->
+            <button type="submit" class="submit-button">Enviar</button>
+            <button type="button" class="price-button" onclick="openPriceModal()">Tabela de Preço</button> <!-- Botão para abrir o modal -->
         </form>
+    </div>
+
+    <!-- Modal para Tabela de Preço -->
+    <div id="priceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePriceModal()">&times;</span>
+            <p></p> <!-- Preços serão inseridos aqui -->
+        </div>
     </div>
 </body>
 </html>

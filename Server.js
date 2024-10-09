@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
 });
 
 // Rota para processar o upload de arquivos
-app.post('/', upload.array('files'), (req, res) => {
+app.post('/upload', upload.array('files'), (req, res) => { // Mudei a rota para '/upload'
   const now = new Date();
   const folderName = now.toISOString().replace(/:/g, '-');
   const dir = path.join(__dirname, uploadsFolder, folderName);
