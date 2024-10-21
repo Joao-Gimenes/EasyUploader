@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+        import { getStorage, ref, listAll, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js';
+        import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+
+        // Configurações do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyCtS5s27_RRNQRYvtBQZsvbA-NT3tJ7s",
+            authDomain: "easyuploader2024.firebaseapp.com",
+            projectId: "easyuploader2024",
+            storageBucket: "easyuploader2024.appspot.com",
+            messagingSenderId: "39965968147",
+            appId: "1:39965968147:web:8f377c74ae8d7923143ce6"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+        const auth = getAuth(app);
+
+        let currentPath = ''; // Rastreia o caminho atual
+
+        // Função para autenticar o usuário
+        async function authenticateUser(email, password) {
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                console.log('Usuário autenticado com sucesso');
+                loadFiles(currentPath); // Chama a função para listar arquivos após autenticar
+                closeModal(); // Fecha o modal após autenticar
+            } catch (error) {
+                console.error('Erro ao autenticar usuário:', error);
+                alert('Email ou senha inválidos.'); // Exibe um alerta para o usuário
+            }
+        }
+
+        // Expondo a função para o escopo global
+        window.authenticateUser = authenticateUser;
+
+        async function loadFiles(folderPath) {
+            const listContainer = document.getElementById('fileList');
+            const folderRef = ref(storage, folderPath); // Referência da pasta
+
+            currentPath = folderPath; // Atualiza o caminho atual
+
+            try {
+                const result = await listAll(folderRef);
+                listContainer.innerHTML = ''; // Limpa a lista antes de exibir os novos arquivos
+
+                if (result.items.length === 0 && result.prefixes.length === 0) {
+                    listContainer.innerHTML = '<li>Nenhum arquivo ou pasta encontrada.</li>';
+                } else {
+                    // Adiciona botão de voltar se não estiver na raiz
+                    if (folderPath) {
+                        const parentFolderPath = folderPath.substring(0, folderPath.lastIndexOf('/'));
+                        const backButton = document.createElement('button');
+                        backButton.textContent = 'Voltar';
+                        backButton.className = 'back-button'; // Aplica a classe de estilo
+                        backButton.onclick = () => loadFiles(parentFolderPath);
+                        listContainer.appendChild(backButton);
+                    }
+
+                    // Exibe as pastas
+                    result.prefixes.forEach(item => {
+                        const listItem = createFileItem(item.name, 'icons/folder.png', item.fullPath, 'Abrir'); // Ícone da pasta adicionado
+                        listContainer.appendChild(listItem);
+                    });
+
+                    // Exibe os arquivos
+                    result.items.forEach(item => {
+                        const fileType = item.name.split('.').pop().toLowerCase();
+                        const icon = getFileIcon(fileType);
+                        const listItem = createFileItem(item.name, icon, item.fullPath, 'Download');
+                        listContainer.appendChild(listItem);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao listar arquivos:', error);
+                listContainer.innerHTML = `<li>Erro ao listar arquivos: ${error.message}</li>`;
+            }
+        }
+
+        function createFileItem(name, icon, path, buttonText) {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `<img src="${icon}" alt="${icon} icon"> ${name}`;          
+            
+            // Cria o botão de ação
+            const actionButton = document.createElement('button');
+            actionButton.textContent = buttonText;
+            actionButton.onclick = () => buttonText === 'Abrir' ? loadFiles(path) : openFile(path); // Chama a função apropriada
+
+            listItem.appendChild(actionButton); // Adiciona o botão ao item
+            return listItem;
+        }
+
+        function getFileIcon(fileType) {
+            switch (fileType) {
+                case 'pdf':
+                    return 'icons/pdf.png'; // Substitua pelo caminho correto do ícone
+                case 'docx':
+                    return 'icons/docx.png'; // Substitua pelo caminho correto do ícone
+                case 'jpg':
+                case 'jpeg':
+                case 'png':
+                    return 'icons/image.png'; // Substitua pelo caminho correto do ícone
+                case 'txt':
+                    return 'icons/txt.png'; // Substitua pelo caminho correto do ícone
+                default:
+                    return 'icons/file.png'; // Ícone padrão
+            }
+        }
+
+        function openFile(path) {
+            const fileRef = ref(storage, path); // Referência do arquivo
+            getDownloadURL(fileRef).then(url => {
+                window.open(url, '_blank'); // Abre o arquivo em uma nova guia
+            }).catch(error => {
+                console.error('Erro ao abrir o arquivo:', error);
+            });
+        }
+
+        function openModal() {
+            document.getElementById('loginModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        window.onload = function() {
+            openModal(); // Abre o modal ao carregar a página
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="color: green;">Painel Admin</h1> <!-- Cor do texto alterada para verde -->
+        
+        <div class="file-list-container">
+            <ul id="fileList"></ul>
+        </div>
+    </div>
+
+    <!-- Modal de Login -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Login</h2>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <button onclick="authenticateUser(document.getElementById('email').value, document.getElementById('password').value)">Entrar</button>
+        </div>
+    </div>
+</body>
+
+</html>

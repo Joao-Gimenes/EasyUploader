@@ -1,0 +1,128 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: green; /* Cor do título alterada para verde */
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Alinha o conteúdo e o botão */
+}
+
+li img {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+.back-button {
+    margin-bottom: 10px; /* Espaçamento inferior para o botão de voltar */
+    width: 100%; /* Faz o botão ocupar toda a largura */
+}
+
+.file-list-container {
+    max-height: 400px; /* Define a altura máxima da lista de arquivos */
+    overflow-y: auto; /* Habilita rolagem apenas quando necessário */
+    border: 1px solid #ccc; /* Adiciona uma borda para melhor visualização */
+    padding: 10px;
+    margin-bottom: 10px; /* Espaçamento inferior */
+}
+
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+    padding-top: 60px; 
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Estilos Responsivos */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+    }
+}
+
+/* Estilo para a lista de arquivos */
+#fileList {
+    max-height: 300px; /* Ajuste a altura máxima conforme necessário */
+    overflow-y: auto;  /* Habilita o scroll apenas quando o conteúdo ultrapassa a altura */
+    padding: 10px;     /* Adiciona um pouco de espaço interno */
+    list-style-type: none; /* Remove os marcadores da lista */
+}
+
+#fileList li {
+    display: flex;    /* Para alinhar ícones e textos */
+    align-items: center; /* Alinha verticalmente os itens */
+    margin: 5px 0;   /* Espaço entre os itens da lista */
+}
+
+#fileList img {
+    width: 20px; /* Ajuste o tamanho do ícone conforme necessário */
+    height: auto; /* Mantém a proporção do ícone */
+    margin-right: 10px; /* Espaço entre o ícone e o texto */
+}
