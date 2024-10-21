@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="admin.css">
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-        import { getStorage, ref, listAll, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js';
+        import { getStorage, ref, listAll, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js';
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
 
         // Configurações do Firebase
@@ -76,7 +76,6 @@
                     logoutButton.id = 'logoutButton';
                     logoutButton.onclick = logoutUser; // Define a ação do botão
                     logoutButton.style.marginBottom = '10px'; // Adiciona uma margem inferior
-                    logoutButton.style.marginTop = '10px'; // Margem superior para afastar da lista
                     listContainer.parentNode.insertBefore(logoutButton, listContainer); // Insere o botão antes da lista
                 }
 
@@ -95,7 +94,7 @@
 
                     // Exibe as pastas
                     result.prefixes.forEach(item => {
-                        const listItem = createFileItem(item.name, 'icons/folder.png', item.fullPath, 'Abrir'); // Ícone da pasta adicionado
+                        const listItem = createFileItem(item.name, 'icons/folder.png', item.fullPath, 'Abrir', true); // true para pastas
                         listContainer.appendChild(listItem);
                     });
 
@@ -103,9 +102,10 @@
                     result.items.forEach(item => {
                         const fileType = item.name.split('.').pop().toLowerCase();
                         const icon = getFileIcon(fileType);
-                        const listItem = createFileItem(item.name, icon, item.fullPath, 'Download');
+                        const listItem = createFileItem(item.name, icon, item.fullPath, 'Download', false); // false para arquivos
                         listContainer.appendChild(listItem);
                     });
+
                 }
             } catch (error) {
                 console.error('Erro ao listar arquivos:', error);
@@ -113,18 +113,29 @@
             }
         }
 
-        function createFileItem(name, icon, path, buttonText) {
+        function createFileItem(name, icon, path, buttonText, isFolder) {
             const listItem = document.createElement('li');
             listItem.innerHTML = `<img src="${icon}" alt="${icon} icon"> ${name}`;
 
-            // Cria o botão de ação
+            // Cria os botões de ação
             const actionButton = document.createElement('button');
             actionButton.textContent = buttonText;
-            actionButton.onclick = () => buttonText === 'Abrir' ? loadFiles(path) : openFile(path); // Chama a função apropriada
+            actionButton.onclick = () => isFolder ? loadFiles(path) : openFile(path); // Chama a função apropriada
 
-            listItem.appendChild(actionButton); // Adiciona o botão ao item
+            listItem.appendChild(actionButton); // Adiciona o botão de abrir ou download
+
+            // Apenas adiciona o botão de exclusão se não for uma pasta
+            if (!isFolder) {
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Excluir';
+                deleteButton.onclick = () => openDeleteModal(path, isFolder); // Passa isFolder para o modal
+                deleteButton.className = 'delete-button'; // Adiciona uma classe para estilização
+                listItem.appendChild(deleteButton); // Adiciona o botão de excluir
+            }
+
             return listItem;
         }
+
 
         function getFileIcon(fileType) {
             switch (fileType) {
@@ -151,6 +162,52 @@
                 console.error('Erro ao abrir o arquivo:', error);
             });
         }
+
+        function openDeleteModal(path, isFolder) {
+            const deleteModal = document.getElementById('deleteModal');
+            deleteModal.style.display = 'block';
+
+            const confirmationMessage = isFolder ?
+                'Tem certeza de que deseja excluir esta pasta?' :
+                'Tem certeza de que deseja excluir este arquivo?';
+
+            document.getElementById('deleteModalMessage').innerText = confirmationMessage;
+
+            // Define a ação de confirmação para o botão de exclusão
+            document.getElementById('confirmDelete').onclick = () => deletePath(path);
+        }
+
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none'; // Fecha o modal
+        }
+
+        window.closeDeleteModal = closeDeleteModal; // Expondo a função para o escopo global
+
+        async function deletePath(path, isFolder) {
+    try {
+        const fileRef = ref(storage, path);
+        
+        // Exclui o arquivo
+        await deleteObject(fileRef);
+        console.log('Arquivo excluído com sucesso:', path);
+
+        // Verifica se a pasta está vazia após a exclusão
+        const folderRef = ref(storage, currentPath); // Referência para a pasta atual
+        const list = await listAll(folderRef); // Lista todos os itens na pasta
+
+        // Se a pasta estiver vazia, redireciona para a lista inicial
+        if (list.items.length === 0 && list.prefixes.length === 0) {
+            loadFiles(''); // Chama a função para carregar a lista inicial
+        } else {
+            loadFiles(currentPath); // Atualiza a lista de arquivos na pasta atual
+        }
+        
+        closeDeleteModal(); // Fecha o modal de exclusão
+    } catch (error) {
+        console.error('Erro ao excluir:', error);
+    }
+}
 
         function openModal() {
             document.getElementById('loginModal').style.display = 'block';
@@ -179,24 +236,36 @@
 
 <body>
     <div class="container">
-        <h1 style="color: green;">Painel Admin</h1> <!-- Cor do texto alterada para verde -->
+        <h1 style="color: green;">Painel Admin</h1>
+        <div id="fileList"></div>
 
-        <div class="file-list-container">
-            <ul id="fileList"></ul>
+        <!-- Modal de login -->
+        <div id="loginModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Login</h2>
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" required>
+                <label for="password">Senha:</label>
+                <input type="password" id="password" required>
+                <button
+                    onclick="authenticateUser(document.getElementById('email').value, document.getElementById('password').value)"
+                    class="login-button">Entrar</button>
+            </div>
         </div>
-    </div>
 
-    <!-- Modal de Login -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Login</h2>
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="password" id="password" placeholder="Senha" required>
-            <button
-                onclick="authenticateUser(document.getElementById('email').value, document.getElementById('password').value)">Entrar</button>
+        <!-- Modal de exclusão -->
+        <!-- Modal de exclusão -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeDeleteModal()">&times;</span>
+                <h2>Confirmar Exclusão</h2>
+                <p id="deleteModalMessage">Tem certeza de que deseja excluir este arquivo?</p>
+                <button id="confirmDelete" class="confirm-delete">Confirmar</button>
+                <button onclick="closeDeleteModal()" class="cancel-button">Cancelar</button>
+            </div>
         </div>
-    </div>
+
 </body>
 
 </html>

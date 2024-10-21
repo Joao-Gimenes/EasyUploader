@@ -86,6 +86,9 @@ button:hover {
     width: 80%; 
 }
 
+.login-button {
+    margin-top: 10px;
+}
 .close {
     color: #aaa;
     float: right;
@@ -125,4 +128,55 @@ button:hover {
     width: 20px; /* Ajuste o tamanho do ícone conforme necessário */
     height: auto; /* Mantém a proporção do ícone */
     margin-right: 10px; /* Espaço entre o ícone e o texto */
+}
+
+/* Estilos para os botões do modal */
+.close {
+    color: #aaa;
+    float: right; /* Flutua à direita */
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer; /* Muda o cursor */
+}
+
+.delete-button {
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px; /* Espaçamento entre botões */
+}
+.delete-button:hover {
+    background-color: darkred;
+    cursor: pointer; /* Muda o cursor */
+}
+
+.confirm-delete {
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px; /* Espaçamento entre botões */
+}
+.confirm-delete:hover {
+    background-color: darkred;
+    cursor: pointer; /* Muda o cursor */
+}
+
+.cancel-button {
+    background-color: gray;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px; /* Espaçamento entre botões */
+}
+.cancel-button:hover {
+    background-color: black;
+    cursor: pointer; /* Muda o cursor */
 }
