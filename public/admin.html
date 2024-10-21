@@ -10,7 +10,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
         import { getStorage, ref, listAll, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js';
-        import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
 
         // Configurações do Firebase
         const firebaseConfig = {
@@ -28,6 +28,7 @@
         const auth = getAuth(app);
 
         let currentPath = ''; // Rastreia o caminho atual
+        let logoutButton; // Variável para o botão de logout
 
         // Função para autenticar o usuário
         async function authenticateUser(email, password) {
@@ -38,12 +39,25 @@
                 closeModal(); // Fecha o modal após autenticar
             } catch (error) {
                 console.error('Erro ao autenticar usuário:', error);
-                alert('Email ou senha inválidos.'); // Exibe um alerta para o usuário
+                alert('Usuário ou senha inválidos'); // Exibe um alerta com a mensagem personalizada
             }
         }
 
-        // Expondo a função para o escopo global
+        // Função para fazer logout
+        async function logoutUser() {
+            try {
+                await signOut(auth);
+                console.log('Usuário deslogado com sucesso');
+                document.getElementById('fileList').innerHTML = ''; // Limpa a lista de arquivos
+                openModal(); // Abre o modal de login após deslogar
+            } catch (error) {
+                console.error('Erro ao deslogar:', error);
+            }
+        }
+
+        // Expondo as funções para o escopo global
         window.authenticateUser = authenticateUser;
+        window.logoutUser = logoutUser;
 
         async function loadFiles(folderPath) {
             const listContainer = document.getElementById('fileList');
@@ -55,8 +69,19 @@
                 const result = await listAll(folderRef);
                 listContainer.innerHTML = ''; // Limpa a lista antes de exibir os novos arquivos
 
+                // Adiciona o botão de logout se ainda não existir
+                if (!logoutButton) {
+                    logoutButton = document.createElement('button');
+                    logoutButton.textContent = 'Logout';
+                    logoutButton.id = 'logoutButton';
+                    logoutButton.onclick = logoutUser; // Define a ação do botão
+                    logoutButton.style.marginBottom = '10px'; // Adiciona uma margem inferior
+                    logoutButton.style.marginTop = '10px'; // Margem superior para afastar da lista
+                    listContainer.parentNode.insertBefore(logoutButton, listContainer); // Insere o botão antes da lista
+                }
+
                 if (result.items.length === 0 && result.prefixes.length === 0) {
-                    listContainer.innerHTML = '<li>Nenhum arquivo ou pasta encontrada.</li>';
+                    listContainer.innerHTML += '<li>Nenhum arquivo ou pasta encontrada.</li>';
                 } else {
                     // Adiciona botão de voltar se não estiver na raiz
                     if (folderPath) {
@@ -90,8 +115,8 @@
 
         function createFileItem(name, icon, path, buttonText) {
             const listItem = document.createElement('li');
-            listItem.innerHTML = `<img src="${icon}" alt="${icon} icon"> ${name}`;          
-            
+            listItem.innerHTML = `<img src="${icon}" alt="${icon} icon"> ${name}`;
+
             // Cria o botão de ação
             const actionButton = document.createElement('button');
             actionButton.textContent = buttonText;
@@ -135,8 +160,19 @@
             document.getElementById('loginModal').style.display = 'none';
         }
 
-        window.onload = function() {
-            openModal(); // Abre o modal ao carregar a página
+        // Verifica se o usuário está autenticado
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log('Usuário logado:', user.email);
+                loadFiles(currentPath); // Carrega os arquivos se o usuário estiver logado
+            } else {
+                console.log('Nenhum usuário logado');
+                openModal(); // Abre o modal se não houver usuário logado
+            }
+        });
+
+        window.onload = function () {
+            // As ações de abertura de modal são gerenciadas pela função onAuthStateChanged
         }
     </script>
 </head>
@@ -144,7 +180,7 @@
 <body>
     <div class="container">
         <h1 style="color: green;">Painel Admin</h1> <!-- Cor do texto alterada para verde -->
-        
+
         <div class="file-list-container">
             <ul id="fileList"></ul>
         </div>
@@ -157,7 +193,8 @@
             <h2>Login</h2>
             <input type="email" id="email" placeholder="Email" required>
             <input type="password" id="password" placeholder="Senha" required>
-            <button onclick="authenticateUser(document.getElementById('email').value, document.getElementById('password').value)">Entrar</button>
+            <button
+                onclick="authenticateUser(document.getElementById('email').value, document.getElementById('password').value)">Entrar</button>
         </div>
     </div>
 </body>
