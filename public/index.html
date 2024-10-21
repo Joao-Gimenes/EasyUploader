@@ -83,78 +83,24 @@
             document.body.appendChild(modal);
         }
 
-        function submitForm(event) {
-            const form = event.target;
-            const formData = new FormData(form);
-
-            // Reinicia o custo para 0 sempre que o formulário é enviado
-            let cost = 0;
-
-            const quantity = parseInt(formData.get('quantidade'), 10); // Número de cópias selecionadas
-            const type = formData.get('tipo');
-
-            // Cálculo do custo
-            switch (type) {
-                case 'Preto e Branco':
-                    cost = 1 + (quantity - 1) * 0.5; // R$ 1,00 + R$ 0,50 por folha a mais
-                    break;
-                case 'Colorido':
-                    cost = 2 + (quantity - 1) * 1; // R$ 2,00 + R$ 1,00 por folha a mais
-                    break;
-                case 'Xerox':
-                    cost = quantity * 0.5; // R$ 0,50 por folha
-                    break;
-            }
-
-            // Adiciona os dados de quantidade e tipo ao FormData
-            formData.append('custo', cost.toFixed(2)); // Armazena o custo total formatado
-            formData.append('tipo', type);
-
-            // Adiciona os arquivos ao FormData
-            for (let file of filesArray) {
-                formData.append('files', file);
-            }
-
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erro na resposta do servidor');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    showSuccessPopup();
-                    form.reset();
-                    filesArray = [];
-                    document.getElementById('totalCost').textContent = 'Total: R$ 0,00'; // Zera o custo exibido
-                    updateFileList();
-                })
-                .catch(error => {
-                    alert('Erro: ' + error.message);
-                });
-        }
-
         function updatePrice() {
             const quantity = parseInt(document.getElementById('user-quantity').value, 10) || 0;
             const type = document.getElementById('user-type').value;
-            let cost = 0;
+            let totalCost = 0;
 
             switch (type) {
                 case 'Preto e Branco':
-                    cost = 1 + (quantity - 1) * 0.5;
+                    totalCost = 1 + (quantity - 1) * 0.5;
                     break;
                 case 'Colorido':
-                    cost = 2 + (quantity - 1) * 1;
+                    totalCost = 2 + (quantity - 1) * 1;
                     break;
                 case 'Xerox':
-                    cost = quantity * 0.5;
+                    totalCost = quantity * 0.5;
                     break;
             }
 
-            document.getElementById('totalCost').textContent = `Total: R$ ${cost.toFixed(2)}`;
+            document.getElementById('totalCost').textContent = `Total: R$ ${totalCost.toFixed(2)}`;
         }
 
         function openPriceModal() {
@@ -163,9 +109,12 @@
 
             const modalContent = modal.querySelector('.modal-content p');
             modalContent.innerHTML = `
-                Preto e Branco: <strong>R$ 1,00</strong> e cada folha a mais <strong>R$ 0,50</strong><br>
-                Colorido: <strong>R$ 2,00</strong> e cada folha a mais <strong>R$ 1,00</strong><br>
-                Xerox e Digitalização: <strong>R$ 0,50</strong>
+                <strong>Tabela de Preços:</strong>
+                <ul>
+                    <li>Preto e Branco: R$ 1,00 pela primeira cópia, R$ 0,50 pelas demais</li>
+                    <li>Colorido: R$ 2,00 pela primeira cópia, R$ 1,00 pelas demais</li>
+                    <li>Xerox: R$ 0,50 por cópia</li>
+                </ul>
             `;
         }
 
@@ -214,12 +163,80 @@
         </form>
     </div>
 
-    <div id="priceModal" class="modal">
+    <div id="priceModal" class="modal" style="display:none;">
         <div class="modal-content">
             <span class="close" onclick="closePriceModal()">&times;</span>
             <p></p>
         </div>
     </div>
+
+    <!-- Firebase App (base SDK) -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+        import { getStorage, ref, uploadBytes } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js';
+
+        // Configurações do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyCtS5s27_RRNQRYvtBQZsvbA-NT3tJ7s",
+            authDomain: "easyuploader2024.firebaseapp.com",
+            projectId: "easyuploader2024",
+            storageBucket: "easyuploader2024.appspot.com",
+            messagingSenderId: "39965968147",
+            appId: "1:39965968147:web:8f377c74ae8d7923143ce6"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+
+        // Função de envio dos arquivos
+        window.submitForm = async function (event) {
+            event.preventDefault();
+            const form = event.target;
+
+            const userName = document.getElementById('user-name').value;
+            const userCourse = document.getElementById('user-course').value;
+
+            // Cria a estrutura da pasta
+            const date = new Date();
+            const formattedDate = `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}_${date.getHours().toString().padStart(2, '0')}-${date.getMinutes().toString().padStart(2, '0')}`;
+            const folderName = `${userName}/${userCourse} - ${formattedDate}/`;
+
+            // Cria o arquivo de texto
+            const quantity = parseInt(document.getElementById('user-quantity').value, 10);
+            const type = document.getElementById('user-type').value;
+            const totalCost = document.getElementById('totalCost').textContent.replace('Total: R$ ', '').replace(',', '.');
+
+            const textContent = `Nome: ${userName}\nCurso: ${userCourse}\nCópias: ${quantity}\nTipo: ${type}\nTotal: R$ ${totalCost}`;
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const textFile = new File([blob], 'info.txt', { type: 'text/plain' });
+
+            // Envio dos arquivos
+            const promises = filesArray.map(file => {
+                const fileRef = ref(storage, folderName + file.name);
+                return uploadBytes(fileRef, file);
+            });
+
+            // Adiciona o arquivo de texto
+            promises.push(uploadBytes(ref(storage, folderName + textFile.name), textFile));
+
+            try {
+                await Promise.all(promises);
+                showSuccessPopup();
+
+                // Limpa os campos após o upload
+                document.getElementById('user-name').value = '';
+                document.getElementById('user-course').value = '';
+                document.getElementById('user-quantity').value = 1; // Redefine para 1
+                document.getElementById('user-type').value = 'Preto e Branco'; // Redefine para 'Preto e Branco'
+                document.getElementById('totalCost').textContent = 'Total: R$ 0,00'; // Redefine o preço
+                filesArray = []; // Limpa a lista de arquivos
+                updateFileList(); // Atualiza a lista de arquivos
+            } catch (error) {
+                console.error('Erro ao enviar arquivos:', error);
+            }
+        };
+    </script>
 </body>
 
 </html>

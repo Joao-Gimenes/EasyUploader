@@ -1,5 +1,21 @@
 // App.js
 import React, { useState } from 'react';
+import { initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
+
+// Configurações do Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDyCtS5s27_RRNQRYvtBQZsvbA-NT3tJ7s",
+  authDomain: "easyuploader2024.firebaseapp.com",
+  projectId: "easyuploader2024",
+  storageBucket: "easyuploader2024.appspot.com",
+  messagingSenderId: "39965968147",
+  appId: "1:39965968147:web:8f377c74ae8d7923143ce6"
+};
+
+// Inicializa o Firebase
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -12,21 +28,14 @@ function App() {
     event.preventDefault();
     if (!selectedFile) return;
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-
+    const storageRef = ref(storage, `uploads/${selectedFile.name}`);
     try {
-      const response = await fetch('http://localhost:5000/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      if (response.ok) {
-        alert('Arquivo enviado com sucesso!');
-      } else {
-        alert('Erro no envio.');
-      }
+      const snapshot = await uploadBytes(storageRef, selectedFile);
+      console.log('Upload concluído:', snapshot);
+      alert('Arquivo enviado com sucesso!');
     } catch (error) {
-      console.error('Erro:', error);
+      console.error('Erro no envio:', error);
+      alert('Erro no envio.');
     }
   };
 
