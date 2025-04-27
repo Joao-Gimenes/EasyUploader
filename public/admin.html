@@ -115,22 +115,27 @@
 
         function createFileItem(name, icon, path, buttonText, isFolder) {
             const listItem = document.createElement('li');
-            listItem.innerHTML = `<img src="${icon}" alt="${icon} icon"> ${name}`;
+
+            // Cria um container para o ícone + nome
+            const fileNameContainer = document.createElement('div');
+            fileNameContainer.className = 'file-name';
+            fileNameContainer.innerHTML = `<img src="${icon}" alt="${icon} icon"><span>${name}</span>`;
+
+            listItem.appendChild(fileNameContainer);
 
             // Cria os botões de ação
             const actionButton = document.createElement('button');
             actionButton.textContent = buttonText;
-            actionButton.onclick = () => isFolder ? loadFiles(path) : openFile(path); // Chama a função apropriada
+            actionButton.onclick = () => isFolder ? loadFiles(path) : openFile(path);
 
-            listItem.appendChild(actionButton); // Adiciona o botão de abrir ou download
+            listItem.appendChild(actionButton);
 
-            // Apenas adiciona o botão de exclusão se não for uma pasta
             if (!isFolder) {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Excluir';
-                deleteButton.onclick = () => openDeleteModal(path, isFolder); // Passa isFolder para o modal
-                deleteButton.className = 'delete-button'; // Adiciona uma classe para estilização
-                listItem.appendChild(deleteButton); // Adiciona o botão de excluir
+                deleteButton.onclick = () => openDeleteModal(path, isFolder);
+                deleteButton.className = 'delete-button';
+                listItem.appendChild(deleteButton);
             }
 
             return listItem;
@@ -185,29 +190,29 @@
         window.closeDeleteModal = closeDeleteModal; // Expondo a função para o escopo global
 
         async function deletePath(path, isFolder) {
-    try {
-        const fileRef = ref(storage, path);
-        
-        // Exclui o arquivo
-        await deleteObject(fileRef);
-        console.log('Arquivo excluído com sucesso:', path);
+            try {
+                const fileRef = ref(storage, path);
 
-        // Verifica se a pasta está vazia após a exclusão
-        const folderRef = ref(storage, currentPath); // Referência para a pasta atual
-        const list = await listAll(folderRef); // Lista todos os itens na pasta
+                // Exclui o arquivo
+                await deleteObject(fileRef);
+                console.log('Arquivo excluído com sucesso:', path);
 
-        // Se a pasta estiver vazia, redireciona para a lista inicial
-        if (list.items.length === 0 && list.prefixes.length === 0) {
-            loadFiles(''); // Chama a função para carregar a lista inicial
-        } else {
-            loadFiles(currentPath); // Atualiza a lista de arquivos na pasta atual
+                // Verifica se a pasta está vazia após a exclusão
+                const folderRef = ref(storage, currentPath); // Referência para a pasta atual
+                const list = await listAll(folderRef); // Lista todos os itens na pasta
+
+                // Se a pasta estiver vazia, redireciona para a lista inicial
+                if (list.items.length === 0 && list.prefixes.length === 0) {
+                    loadFiles(''); // Chama a função para carregar a lista inicial
+                } else {
+                    loadFiles(currentPath); // Atualiza a lista de arquivos na pasta atual
+                }
+
+                closeDeleteModal(); // Fecha o modal de exclusão
+            } catch (error) {
+                console.error('Erro ao excluir:', error);
+            }
         }
-        
-        closeDeleteModal(); // Fecha o modal de exclusão
-    } catch (error) {
-        console.error('Erro ao excluir:', error);
-    }
-}
 
         function openModal() {
             document.getElementById('loginModal').style.display = 'block';
@@ -239,33 +244,37 @@
         <h1 style="color: green;">Painel Admin</h1>
         <div id="fileList"></div>
 
-        <!-- Modal de login -->
+        <!-- Modal de Login -->
         <div id="loginModal" class="modal">
             <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
                 <h2>Login</h2>
-                <label for="email">E-mail:</label>
-                <input type="email" id="email" required>
-                <label for="password">Senha:</label>
-                <input type="password" id="password" required>
-                <button
-                    onclick="authenticateUser(document.getElementById('email').value, document.getElementById('password').value)"
-                    class="login-button">Entrar</button>
+                <input type="email" id="email" placeholder="Email">
+                <input type="password" id="password" placeholder="Senha">
+                <button onclick="authenticateUser(email.value, password.value)">Entrar</button>
             </div>
         </div>
 
-        <!-- Modal de exclusão -->
-        <!-- Modal de exclusão -->
+        <!-- Modal de Confirmação de Exclusão -->
+
+
+        <!-- Modal de Confirmação de Exclusão -->
         <div id="deleteModal" class="modal">
             <div class="modal-content">
-                <span class="close" onclick="closeDeleteModal()">&times;</span>
                 <h2>Confirmar Exclusão</h2>
-                <p id="deleteModalMessage">Tem certeza de que deseja excluir este arquivo?</p>
-                <button id="confirmDelete" class="confirm-delete">Confirmar</button>
-                <button onclick="closeDeleteModal()" class="cancel-button">Cancelar</button>
+                <p id="deleteModalMessage">Tem certeza que deseja excluir?</p>
+                <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 20px;">
+                    <button id="confirmDelete" class="confirm-delete">Confirmar</button>
+                    <button onclick="closeDeleteModal()" class="cancel-button">Cancelar</button>
+                </div>
             </div>
         </div>
 
+
+
+        <!-- Lista de Arquivos/Pastas -->
+        <div id="adminContainer">
+            <ul id="fileList"></ul>
+        </div>
 </body>
 
 </html>

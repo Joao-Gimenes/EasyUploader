@@ -1,182 +1,332 @@
-body {
-    font-family: Arial, sans-serif;
+/* === Reset Básico === */
+body,
+h1,
+ul,
+li,
+button {
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    box-sizing: border-box;
+}
+
+/* === Corpo e Estrutura === */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 10px;
 }
 
 .container {
+    width: 100%;
     max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* === Título === */
 h1 {
     text-align: center;
-    color: green; /* Cor do título alterada para verde */
+    font-size: 2rem;
+    margin-bottom: 25px;
+    color: #2e7d32;
 }
 
-ul {
-    list-style: none;
-    padding: 0;
+/* === Botões === */
+button,
+.delete-button,
+.confirm-delete,
+.cancel-button {
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    border: none;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
 }
 
-li {
+button:hover,
+.delete-button:hover,
+.confirm-delete:hover,
+.cancel-button:hover {
+    background: linear-gradient(135deg, #388e3c, #43a047);
+}
+
+/* Botões específicos */
+.delete-button,
+.confirm-delete {
+    background: linear-gradient(135deg, #e53935, #ef5350);
+}
+
+.delete-button:hover,
+.confirm-delete:hover {
+    background: linear-gradient(135deg, #c62828, #e53935);
+}
+
+.cancel-button {
+    background: linear-gradient(135deg, #757575, #9e9e9e);
+}
+
+.cancel-button:hover {
+    background: linear-gradient(135deg, #424242, #616161);
+}
+
+/* === Botões do Modal de Exclusão === */
+/* Botão Confirmar (verde bonito) */
+#confirmDelete {
+    background: linear-gradient(135deg, #28a745, #34d058);
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 12px;
+    width: 100%;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#confirmDelete:hover {
+    background: linear-gradient(135deg, #218838, #28a745);
+}
+
+/* Botão Cancelar (cinza neutro) */
+#deleteModal button:last-child {
+    background: linear-gradient(135deg, #6c757d, #868e96);
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 12px;
+    width: 100%;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#deleteModal button:last-child:hover {
+    background: linear-gradient(135deg, #5a6268, #6c757d);
+}
+
+/* Botão de voltar */
+.back-button {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/* === Lista de Arquivos === */
+.file-list-container {
+    max-height: 450px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: #fafafa;
+    text-overflow: ellipsis;
+}
+
+/* Estiliza os itens da lista para nome não estourar */
+li,
+#fileList li {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Alinha o conteúdo e o botão */
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+    gap: 10px;
 }
 
-li img {
+/* Adiciona uma div pro texto do arquivo */
+.file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Scroll personalizado */
+.file-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.file-list-container::-webkit-scrollbar-thumb {
+    background-color: #bbb;
+    border-radius: 8px;
+}
+
+.file-list-container::-webkit-scrollbar-thumb:hover {
+    background-color: #999;
+}
+
+/* Itens da lista */
+ul,
+#fileList {
+    list-style: none;
+}
+
+li,
+#fileList li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+li:hover,
+#fileList li:hover {
+    background-color: #f1f1f1;
+}
+
+li img,
+#fileList img {
     width: 24px;
     height: 24px;
     margin-right: 10px;
 }
 
-button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #218838;
-}
-
-.back-button {
-    margin-bottom: 10px; /* Espaçamento inferior para o botão de voltar */
-    width: 100%; /* Faz o botão ocupar toda a largura */
-}
-
-.file-list-container {
-    max-height: 400px; /* Define a altura máxima da lista de arquivos */
-    overflow-y: auto; /* Habilita rolagem apenas quando necessário */
-    border: 1px solid #ccc; /* Adiciona uma borda para melhor visualização */
-    padding: 10px;
-    margin-bottom: 10px; /* Espaçamento inferior */
-}
-
+/* === Modal === */
 .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1; 
+    display: none;
+    position: fixed;
+    z-index: 999;
     left: 0;
     top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgb(0,0,0); 
-    background-color: rgba(0,0,0,0.4); 
-    padding-top: 60px; 
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 60px;
 }
 
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Estilo do modal geral */
 .modal-content {
-    background-color: #fefefe;
-    margin: 5% auto; 
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; 
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    margin: 100px auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.login-button {
-    margin-top: 10px;
+/* Título do Modal */
+.modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
 }
+
+/* Inputs do Modal de Login */
+.modal-content input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Botão do Modal de Login */
+.modal-content button {
+    width: 100%;
+    padding: 12px;
+    background: #4CAF50;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.modal-content button:hover {
+    background: #45a049;
+}
+
+/* === Estilos Específicos do Modal de Exclusão === */
+.modal-content .modal-buttons {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.modal-content .modal-buttons button {
+    flex: 1;
+}
+
+/* === Fechar Modal === */
 .close {
-    color: #aaa;
+    color: #888;
     float: right;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .close:hover,
 .close:focus {
     color: black;
     text-decoration: none;
-    cursor: pointer;
 }
 
-/* Estilos Responsivos */
+/* === Responsividade === */
 @media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+
     .modal-content {
         width: 95%;
+        padding: 20px;
     }
 }
 
-/* Estilo para a lista de arquivos */
-#fileList {
-    max-height: 300px; /* Ajuste a altura máxima conforme necessário */
-    overflow-y: auto;  /* Habilita o scroll apenas quando o conteúdo ultrapassa a altura */
-    padding: 10px;     /* Adiciona um pouco de espaço interno */
-    list-style-type: none; /* Remove os marcadores da lista */
+/* === Animação de Fade e Zoom para o Modal === */
+@keyframes modalFadeZoom {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-#fileList li {
-    display: flex;    /* Para alinhar ícones e textos */
-    align-items: center; /* Alinha verticalmente os itens */
-    margin: 5px 0;   /* Espaço entre os itens da lista */
-}
-
-#fileList img {
-    width: 20px; /* Ajuste o tamanho do ícone conforme necessário */
-    height: auto; /* Mantém a proporção do ícone */
-    margin-right: 10px; /* Espaço entre o ícone e o texto */
-}
-
-/* Estilos para os botões do modal */
-.close {
-    color: #aaa;
-    float: right; /* Flutua à direita */
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer; /* Muda o cursor */
-}
-
-.delete-button {
-    background-color: red;
-    color: white;
-    border: none;
-    cursor: pointer;
-    margin-left: 10px; /* Espaçamento entre botões */
-}
-.delete-button:hover {
-    background-color: darkred;
-    cursor: pointer; /* Muda o cursor */
-}
-
-.confirm-delete {
-    background-color: red;
-    color: white;
-    border: none;
-    cursor: pointer;
-    margin-left: 10px; /* Espaçamento entre botões */
-}
-.confirm-delete:hover {
-    background-color: darkred;
-    cursor: pointer; /* Muda o cursor */
-}
-
-.cancel-button {
-    background-color: gray;
-    color: white;
-    border: none;
-    cursor: pointer;
-    margin-left: 10px; /* Espaçamento entre botões */
-}
-.cancel-button:hover {
-    background-color: black;
-    cursor: pointer; /* Muda o cursor */
+/* Aplicando a animação */
+.modal-content {
+    animation: modalFadeZoom 0.3s ease forwards;
 }

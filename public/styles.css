@@ -1,197 +1,256 @@
+/* styles.css */
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilização geral */
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
+    background: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 20px;
-    background-color: #f4f4f4;
+}
+
+/* Container principal */
+.container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+}
+
+/* Título */
+.container h1 {
+    text-align: center;
+    margin-bottom: 20px;
     color: #333;
 }
 
-h1 {
-    text-align: center;
-    color: #4a90e2;
-}
-
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-form {
-    background-color: white;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-}
-
+/* Estilo dos grupos de formulário */
 .form-group {
-    display: flex;
-    align-items: center;
     margin-bottom: 15px;
 }
 
-.form-group label {
-    font-size: 18px; /* Aumentado o tamanho do texto */
-    margin-right: 10px;
-    font-weight: bold; /* Deixar o label em negrito */
-    width: 80px; /* Aumentado o espaço para o label */
+/* Labels */
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #555;
 }
 
-.form-group input {
-    width: calc(100% - 90px); /* Reduzido o input */
-    padding: 8px;
-    box-sizing: border-box;
+/* Inputs de texto e número */
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fafafa;
+    margin-bottom: 10px;
 }
 
-input[type="file"] {
+/* Botão de escolher arquivos */
+.file-label {
+    display: block;
+    padding: 12px;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* Esconde o input de arquivo real */
+.file-input {
     display: none;
 }
 
-label.file-label {
-    background-color: #4a90e2;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
+/* Lista de arquivos */
+.file-list {
+    list-style: none;
+    margin-top: 10px;
     margin-bottom: 10px;
-    width: auto;
-    text-align: center;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
 }
 
-label.file-label:hover {
-    background-color: #357ab7;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
+/* Itens da lista de arquivos */
+.file-list li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    margin-top: 5px;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
 }
 
+/* Botão de remover arquivo */
 .remove-button {
-    margin-left: 10px;
-    flex-shrink: 0;
-}
-
-button {
     background-color: #e74c3c;
     color: white;
     border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 6px 10px;
+    border-radius: 6px;
     cursor: pointer;
-    width: 80px;
-    transition: background-color 0.3s;
+    font-size: 12px;
 }
 
-button:hover {
+.remove-button:hover {
     background-color: #c0392b;
 }
 
-.submit-button {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 80px;
+/* Mensagem de arquivos */
+.file-message {
     margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Botões principais */
+.submit-button,
+.price-button,
+.admin-button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Botão Enviar */
+.submit-button {
+    background-color: #3498db;
+    color: white;
 }
 
 .submit-button:hover {
-    background-color: #c0392b;
+    background-color: #2980b9;
 }
 
-#fileList {
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-#fileMessage {
-    text-align: center;
-    font-weight: bold;
-    margin-top: 10px;
-    font-size: 14px;
-    color: #777;
-}
-
+/* Botão Tabela de Preço */
 .price-button {
-    background-color: #007BFF;
+    background-color: #f39c12;
     color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 15px;
-    display: block;
-    width: 100%;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background-color 0.3s;
 }
 
 .price-button:hover {
-    background-color: #0056b3;
+    background-color: #d68910;
 }
 
+/* Botão Admin */
+.admin-button {
+    background-color: #9b59b6;
+    color: white;
+}
+
+.admin-button:hover {
+    background-color: #8e44ad;
+}
+
+/* Total do custo */
+#totalCost {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #333;
+    text-align: center;
+}
+
+/* Modal */
 .modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
+    overflow: auto;
     background-color: rgba(0, 0, 0, 0.5);
-    padding-top: 60px;
+    /* Fundo escuro */
 }
 
 .modal-content {
-    background-color: white;
-    margin: 5% auto;
-    padding: 20px;
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 30px;
     border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
+    width: 400px;
+    /* Aumentei de 300px pra 400px */
+    border-radius: 12px;
     position: relative;
-    border-radius: 10px;
+    text-align: center;
+    /* Centraliza o texto */
 }
 
 .modal-content h2 {
-    color: #2ecc71;
+    font-size: 24px;
+    margin-bottom: 10px;
 }
 
 .modal-content p {
     font-size: 18px;
-    line-height: 1.6;
 }
 
+/* Botão de fechar */
 .close {
     position: absolute;
     top: 10px;
     right: 15px;
-    font-size: 28px;
-    font-weight: bold;
     color: #aaa;
+    font-size: 20px;
+    font-weight: bold;
     cursor: pointer;
 }
 
 .close:hover,
 .close:focus {
-    color: black;
+    color: #000;
     text-decoration: none;
-    cursor: pointer;
+}
+
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+}
+
+/* === Animação de Fade e Zoom para o Modal === */
+@keyframes modalFadeZoom {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Aplicando a animação */
+.modal-content {
+    animation: modalFadeZoom 0.3s ease forwards;
 }
